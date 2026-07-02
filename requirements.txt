@@ -1,0 +1,6 @@
+numpy
+opencv-python-headless
+mediapipe==0.10.5
+streamlit
+streamlit_webrtc
+streamlit_authenticator
