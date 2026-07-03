@@ -34,6 +34,7 @@ set_sidebar_visibility(authentication_status)
 
 if authentication_status == False:
     st.error('Usernames and passwords do not match. Please try again.')
+    st.error("Use 'dhruv' for username and password.")
 if authentication_status == None:
     st.error("Please enter you username and password to login")
 if authentication_status == True:
