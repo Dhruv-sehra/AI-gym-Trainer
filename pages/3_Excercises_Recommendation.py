@@ -132,7 +132,7 @@ if st.button("Submit"):
     parsed_response = parse_calendar_response(saved_response)
 
     st.write(bot_respond)
-    st.write("Calendar events:", parsed_response if parsed_response is not None else saved_response)
+    #st.write("Calendar events:", parsed_response if parsed_response is not None else saved_response)
 
     if parsed_response is not None:
         st.session_state['transferred_variable'] = parsed_response
