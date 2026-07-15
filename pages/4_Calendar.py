@@ -1,4 +1,5 @@
 import ast
+import datetime
 import json
 import re
 import streamlit as st
@@ -52,11 +53,50 @@ def parse_calendar_data(transferred_value):
     return None
 
 
+def repeat_weekly_schedule(events, repeat_weeks=4, skip_sunday=True):
+    if not isinstance(events, list) or not events:
+        return events
+
+    def parse_date(date_str):
+        try:
+            return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            return None
+
+    repeated = list(events)
+    existing_keys = {(ev.get("title"), ev.get("start"), ev.get("end"), ev.get("resourceId")) for ev in events}
+
+    for week in range(1, repeat_weeks):
+        for event in events:
+            start_date = parse_date(event.get("start", ""))
+            end_date = parse_date(event.get("end", ""))
+            if start_date is None or end_date is None:
+                continue
+
+            new_start = start_date + datetime.timedelta(weeks=week)
+            new_end = end_date + datetime.timedelta(weeks=week)
+            if skip_sunday and new_start.weekday() == 6:
+                continue
+
+            new_event = event.copy()
+            new_event["start"] = new_start.isoformat()
+            new_event["end"] = new_end.isoformat()
+
+            key = (new_event.get("title"), new_event.get("start"), new_event.get("end"), new_event.get("resourceId"))
+            if key not in existing_keys:
+                repeated.append(new_event)
+                existing_keys.add(key)
+
+    return repeated
+
+
 events = parse_calendar_data(transferred_value)
 if events is None:
     if transferred_value is not None:
         st.warning("Saved calendar data is not valid JSON or Python list. Please submit a new plan.")
     events = []
+else:
+    events = repeat_weekly_schedule(events, repeat_weeks=4, skip_sunday=True)
 
 mode = st.selectbox(
     "Calendar Mode:",
